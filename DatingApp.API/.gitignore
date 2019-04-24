@@ -1,0 +1,4 @@
+.viscode
+bin
+obj
+*.db
