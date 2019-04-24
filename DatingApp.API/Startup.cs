@@ -39,6 +39,7 @@ namespace DatingApp.API
                     builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
             });
+            services.AddScoped<IAuthRepository, AuthRepository>();
             
         }
 
