@@ -38,13 +38,18 @@ namespace DatingApp.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ///Add DB Context
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+
+            ///Add MVC
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddJsonOptions(opt =>
                 {
                     opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 
                 });
+
+            ///Add Cors
             services.AddCors(options =>
             {
                 options.AddPolicy(MyAllowSpecificOrigins,
@@ -53,21 +58,28 @@ namespace DatingApp.API
                     builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
             });
+            /// Add Automapper;
+            //Mapper.Initialize(cfg => cfg.AddProfile<AutoMapperProfiles>());
+            services.AddAutoMapper();
 
-            //services.AddAutoMapper();
-            var mappingConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new AutoMapperProfiles());
-            });
+            
+            // var mappingConfig = new MapperConfiguration(mc =>
+            // {
+            //     mc.AddProfile(new AutoMapperProfiles());
+            // });
+            // IMapper mapper = mappingConfig.CreateMapper();
+            // services.AddSingleton(mapper);
 
-            IMapper mapper = mappingConfig.CreateMapper();
-            services.AddSingleton(mapper);
-
+            ///Add Seed Users (Not Used)
             services.AddTransient<Seed>();
 
+            /// Add Auth Repo
             services.AddScoped<IAuthRepository, AuthRepository>();
+
+            /// Add Dating Repo
             services.AddScoped<IDatingRepository, DatingRepository>();
 
+            /// Add JWT Token
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
