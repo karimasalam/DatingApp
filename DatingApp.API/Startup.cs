@@ -62,8 +62,9 @@ namespace DatingApp.API
             /// Add Automapper;
             //Mapper.Initialize(cfg => cfg.AddProfile<AutoMapperProfiles>());
             services.AddAutoMapper();
+            services.AddScoped<LogUserActivity>();
 
-            
+
             // var mappingConfig = new MapperConfiguration(mc =>
             // {
             //     mc.AddProfile(new AutoMapperProfiles());
