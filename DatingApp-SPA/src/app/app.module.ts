@@ -7,7 +7,8 @@ import { BsDropdownModule, TabsModule, BsDatepickerModule, PaginationModule, But
 import { RouterModule } from '@angular/router';
 import { JwtModule } from '@auth0/angular-jwt';
 import { NgxGalleryModule } from 'ngx-gallery';
-import {TimeAgoPipe} from 'time-ago-pipe';
+import { TimeAgoPipe } from 'time-ago-pipe';
+import { ListsResolver } from './_resolvers/lists.resolver';
 
 
 import { NavComponent } from './nav/nav.component';
@@ -31,6 +32,7 @@ import { MemberEditResolver } from './_resolvers/member-edit.resolver';
 import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guards';
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
 import { FileUploadModule } from 'ng2-file-upload';
+
 
 
 
@@ -84,7 +86,8 @@ export function tokenGetter() {
       MemberDetailResolver,
       MemberListResolver,
       MemberEditResolver,
-      PreventUnsavedChanges
+      PreventUnsavedChanges,
+      ListsResolver
    ],
    bootstrap: [
       AppComponent
