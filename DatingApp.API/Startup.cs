@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -39,8 +40,70 @@ namespace DatingApp.API
         public void ConfigureServices(IServiceCollection services)
         {
             ///Add DB Context
-            services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            
+            services.AddDbContext<DataContext>(x => x.UseMySql(Configuration.GetConnectionString("DefaultConnection"))
+            .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning)));
+            ///Add MVC
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(opt =>
+                {
+                    opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 
+                });
+
+            ///Add Cors
+            services.AddCors(options =>
+            {
+                options.AddPolicy(MyAllowSpecificOrigins,
+                builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
+            });
+            services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
+            /// Add Automapper;
+            //Mapper.Initialize(cfg => cfg.AddProfile<AutoMapperProfiles>());
+            services.AddAutoMapper();
+            services.AddScoped<LogUserActivity>();
+            
+
+
+            // var mappingConfig = new MapperConfiguration(mc =>
+            // {
+            //     mc.AddProfile(new AutoMapperProfiles());
+            // });
+            // IMapper mapper = mappingConfig.CreateMapper();
+            // services.AddSingleton(mapper);
+
+            ///Add Seed Users (Not Used)
+            services.AddTransient<Seed>();
+
+            /// Add Auth Repo
+            services.AddScoped<IAuthRepository, AuthRepository>();
+
+            /// Add Dating Repo
+            services.AddScoped<IDatingRepository, DatingRepository>();
+
+            /// Add JWT Token
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+
+        }
+        public void ConfigureDevelopmentServices(IServiceCollection services)
+        {
+            ///Add DB Context
+            
+            services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             ///Add MVC
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddJsonOptions(opt =>
@@ -128,7 +191,14 @@ namespace DatingApp.API
             //seeder.SeedUsers();
             app.UseCors(MyAllowSpecificOrigins);
             app.UseAuthentication();
-            app.UseMvc();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+            app.UseMvc(routes => {
+                routes.MapSpaFallbackRoute(
+                    name: "spafallback",
+                    defaults: new { controller = "Fallback", action = "Index" }
+                );
+            });
         }
     }
 }
