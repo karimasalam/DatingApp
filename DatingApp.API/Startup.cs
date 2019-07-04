@@ -51,6 +51,8 @@ namespace DatingApp.API
 
                 });
 
+            services.BuildServiceProvider().GetService<DataContext>().Database.Migrate();
+
             ///Add Cors
             services.AddCors(options =>
             {
@@ -62,19 +64,13 @@ namespace DatingApp.API
             });
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             /// Add Automapper;
-            //Mapper.Initialize(cfg => cfg.AddProfile<AutoMapperProfiles>());
+            
             services.AddAutoMapper();
             services.AddScoped<LogUserActivity>();
             
 
 
-            // var mappingConfig = new MapperConfiguration(mc =>
-            // {
-            //     mc.AddProfile(new AutoMapperProfiles());
-            // });
-            // IMapper mapper = mappingConfig.CreateMapper();
-            // services.AddSingleton(mapper);
-
+         
             ///Add Seed Users (Not Used)
             services.AddTransient<Seed>();
 
@@ -110,8 +106,7 @@ namespace DatingApp.API
                 {
                     opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 
-                });
-
+                });            
             ///Add Cors
             services.AddCors(options =>
             {
@@ -123,18 +118,9 @@ namespace DatingApp.API
             });
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             /// Add Automapper;
-            //Mapper.Initialize(cfg => cfg.AddProfile<AutoMapperProfiles>());
+            
             services.AddAutoMapper();
             services.AddScoped<LogUserActivity>();
-            
-
-
-            // var mappingConfig = new MapperConfiguration(mc =>
-            // {
-            //     mc.AddProfile(new AutoMapperProfiles());
-            // });
-            // IMapper mapper = mappingConfig.CreateMapper();
-            // services.AddSingleton(mapper);
 
             ///Add Seed Users (Not Used)
             services.AddTransient<Seed>();
@@ -188,7 +174,7 @@ namespace DatingApp.API
             }
 
             // app.UseHttpsRedirection();
-            //seeder.SeedUsers();
+            seeder.SeedUsers();
             app.UseCors(MyAllowSpecificOrigins);
             app.UseAuthentication();
             app.UseDefaultFiles();
