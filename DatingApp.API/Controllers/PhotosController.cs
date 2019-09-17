@@ -13,8 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace DatingApp.API.Controllers
-{
-    [Authorize]
+{    
     [Route("api/users/{userId}/photos")]
     [ApiController]
     public class PhotosController : ControllerBase
@@ -74,7 +73,7 @@ namespace DatingApp.API.Controllers
             {
                 photo.IsMain = true;
             }
-
+            photo.isApproved = false;
             UserFromRepo.Photos.Add(photo);
 
 
